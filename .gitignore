@@ -1,0 +1,40 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Modelos entrenados (muy pesados)
+models/*.h5
+models/*.keras
+models/*.pkl
+
+# Datos grandes
+data/*.xlsx
+data/*.csv
+*.xlsx
+*.csv
+
+# Gráficas generadas
+plots/*.png
+plots/*.jpg
+results/plots/*.png
+results/plots/*.jpg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
