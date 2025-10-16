@@ -12,7 +12,7 @@ proyecto/
 │   └── recommendations/
 ├── data/
 ├── models/
-├── plots/
+├── results/
 ├── requirements.txt
 └── README.md
 ```
