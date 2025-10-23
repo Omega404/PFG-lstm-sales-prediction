@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net" modified="2025-10-15T21:00:00.000Z" agent="5.0 (Windows)" version="24.7.10" editor="draw.io" type="device">
+  <diagram id="ArquitecturaSistema" name="Arquitectura del Sistema de Información">
+    <mxGraphModel dx="1420" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Capa de Datos -->
+        <mxCell id="dataLayer" value="Capa de Datos&#xa;- Recolectar, limpiar y almacenar datos históricos de ventas&#xa;- Integrar datasets estructurados (Kaggle, registros internos)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="200" width="300" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Flecha hacia Modelado -->
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;endArrow=block;html=1;strokeColor=#6c8ebf;" edge="1" parent="1" source="dataLayer" target="modelLayer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Capa de Modelado Predictivo -->
+        <mxCell id="modelLayer" value="Capa de Modelado Predictivo&#xa;- Entrenar modelos LSTM (Long Short-Term Memory)&#xa;- Validar y registrar experimentos en MLflow&#xa;- Evaluar métricas (MAE, RMSE)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="200" width="300" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Flecha hacia Aplicación -->
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;endArrow=block;html=1;strokeColor=#9673a6;" edge="1" parent="1" source="modelLayer" target="appLayer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Capa de Aplicación -->
+        <mxCell id="appLayer" value="Capa de Aplicación&#xa;- Visualizar predicciones y alertas en dashboard&#xa;- Generar notificaciones y reportes automáticos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="900" y="200" width="300" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Marco general -->
+        <mxCell id="framework" value="Principios Transversales&#xa;MLOps: Trazabilidad, automatización y escalabilidad&#xa;Spec-Driven Development: Definir funcionalidades antes de implementarlas" style="whiteSpace=wrap;html=1;strokeColor=#999999;fillColor=#ffffff;fontSize=13;dashed=1;fontStyle=0" vertex="1" parent="1">
+          <mxGeometry x="70" y="150" width="1200" height="220" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

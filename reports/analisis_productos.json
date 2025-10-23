@@ -1,0 +1,20 @@
+{
+  "fecha_analisis": "2025-10-15 17:12:50",
+  "total_productos": 4070,
+  "productos_aptos": 123,
+  "tasa_aprobacion": "3.0%",
+  "filtros_aplicados": {
+    "min_transactions": 500,
+    "min_days_with_sales": 100,
+    "max_cv": 300,
+    "max_negative_pct": 5,
+    "min_avg_quantity": 3,
+    "min_sales_density": 20
+  },
+  "estadisticas_generales": {
+    "cv_promedio": 394.79878656228357,
+    "cv_mediana": 154.2320397572355,
+    "transacciones_promedio": 133.14717444717445,
+    "densidad_ventas_promedio": 25.141068522736987
+  }
+}

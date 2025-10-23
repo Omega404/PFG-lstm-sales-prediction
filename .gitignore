@@ -15,16 +15,24 @@ models/*.keras
 models/*.pkl
 
 # Datos grandes
+./data
 data/*.xlsx
 data/*.csv
 *.xlsx
 *.csv
+
 
 # Gráficas generadas
 plots/*.png
 plots/*.jpg
 results/plots/*.png
 results/plots/*.jpg
+results/reports/*.pdf
+results/reports/*.docx
+results/reports/*.xlsx
+results/reports/*.csv
+results/reports/*.json
+results/reports/temporal/*.json
 
 # IDE
 .vscode/
@@ -38,3 +46,10 @@ Thumbs.db
 
 # Logs
 *.log
+
+#notas
+/data/notes/*.txt
+/notes/*.txt
+/notes/*.md
+notes/notes/claude.txt 
+notes/claude.txt 
