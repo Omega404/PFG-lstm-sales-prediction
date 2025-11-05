@@ -1,0 +1,14 @@
+{
+  "horizon": "medium",
+  "total_loss": 6.766486644744873,
+  "purchase_prob_loss": 0.6298739910125732,
+  "days_loss": 0.6773578524589539,
+  "value_loss": 11.595305442810059,
+  "purchase_prob_accuracy": 0.4709150195121765,
+  "purchase_prob_auc": 0.6392917037010193,
+  "days_mae": 0.6749213933944702,
+  "value_mae": 1.0244823694229126,
+  "train_samples": 626653,
+  "val_samples": 156664,
+  "epochs_trained": 30
+}

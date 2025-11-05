@@ -1,22 +1,49 @@
+# ============================================================================
+# DOCKERFILE PARA GOOGLE CLOUD RUN - LSTM PREDICTION SERVICE
+# ============================================================================
 
-FROM python:3.10-slim
+FROM python:3.11-slim
 
-# Evitar pyc y buffers
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Dependencias del sistema (pandas/openpyxl nativos)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    python3-dev \
-    libatlas-base-dev \
- && rm -rf /var/lib/apt/lists/*
+# Variables de entorno
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PORT=8080 \
+    TF_CPP_MIN_LOG_LEVEL=2 \
+    TF_ENABLE_ONEDNN_OPTS=0
 
 WORKDIR /app
-COPY requirements.txt ./
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar requirements
+COPY requirements.txt .
+
+# Instalar dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copiar aplicacion
+COPY app_prediccion_lstm.py .
+COPY prediccion_lstm.html .
+
+# Crear directorios necesarios
+RUN mkdir -p data/processed models/trained
+
+# Copiar datos y modelos explícitamente
+COPY data/processed/product_demand.xlsx ./data/processed/product_demand.xlsx
+COPY models/trained/*.h5 ./models/trained/
+COPY models/trained/*.pkl ./models/trained/
+
+# Crear usuario no-root
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
 
 EXPOSE 8080
-CMD [ "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080" ]
+
+# Comando de inicio
+CMD exec python app_prediccion_lstm.py

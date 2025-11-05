@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Integrado - Cliente-Producto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            background: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Heatmap */
+        .heatmap-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .heatmap {
+            display: grid;
+            gap: 2px;
+            background: #e0e0e0;
+            padding: 2px;
+            border-radius: 8px;
+        }
+
+        .heatmap-cell {
+            padding: 8px;
+            text-align: center;
+            font-size: 0.8em;
+            border-radius: 4px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .heatmap-header {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Dashboard Integrado</h1>
+            <div class="subtitle">Análisis Cliente-Producto con LSTM</div>
+
+            <div class="stats-row" id="statsRow">
+                <div class="stat-box">
+                    <div class="label">Total Clientes</div>
+                    <div class="value" id="totalCustomers">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Total Productos</div>
+                    <div class="value" id="totalProducts">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Transacciones</div>
+                    <div class="value" id="totalTransactions">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Modelos Activos</div>
+                    <div class="value" id="totalModels">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">📈 Vista General</button>
+            <button class="tab" onclick="switchTab('products')">📦 Predicción de Productos</button>
+            <button class="tab" onclick="switchTab('customer')">👤 Análisis por Cliente</button>
+            <button class="tab" onclick="switchTab('matrix')">🔥 Matriz Cliente-Producto</button>
+            <button class="tab" onclick="switchTab('forecast')">🎯 Forecast Agregado</button>
+        </div>
+
+        <!-- Tab 1: Vista General -->
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h2>🎯 Vista General del Sistema</h2>
+                <p style="margin-bottom: 20px;">Sistema de análisis integrado que combina predicciones de clientes y productos para generar insights de negocio completos.</p>
+
+                <div class="grid-3">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                        <h3 style="color: #667eea; margin-bottom: 10px;">🤖 Modelos de Clientes</h3>
+                        <p>Predicen:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px; color: #666;">
+                            <li>Probabilidad de compra</li>
+                            <li>Días hasta próxima compra</li>
+                            <li>Valor esperado</li>
+                        </ul>
+                        <div id="customerModelsInfo" style="margin-top: 15px; font-weight: bold; color: #667eea;"></div>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                        <h3 style="color: #764ba2; margin-bottom: 10px;">📦 Modelos de Productos</h3>
+                        <p>Predicen:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px; color: #666;">
+                            <li>Demanda futura</li>
+                            <li>Unidades a vender</li>
+                            <li>Tendencias temporales</li>
+                        </ul>
+                        <div id="productModelsInfo" style="margin-top: 15px; font-weight: bold; color: #764ba2;"></div>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                        <h3 style="color: #28a745; margin-bottom: 10px;">🔗 Análisis Cruzado</h3>
+                        <p>Combina:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px; color: #666;">
+                            <li>Patrones históricos</li>
+                            <li>Afinidad cliente-producto</li>
+                            <li>Forecast integrado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Predicción de Productos -->
+        <div id="products" class="tab-content">
+            <div class="card">
+                <h2>📦 Predicción LSTM de Demanda de Productos</h2>
+                <p style="margin-bottom: 20px;">Selecciona un producto para predecir la demanda de los próximos 3 días</p>
+
+                <div class="form-group">
+                    <label>Seleccionar Producto</label>
+                    <select id="productSelect">
+                        <option value="">-- Cargando productos... --</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="predictProduct()">🔮 Predecir Demanda</button>
+
+                <div id="productResult"></div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Análisis por Cliente -->
+        <div id="customer" class="tab-content">
+            <div class="card">
+                <h2>👤 Análisis Individual de Cliente</h2>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Customer ID</label>
+                        <input type="number" id="customerId" placeholder="Ej: 12345">
+                    </div>
+                    <div class="form-group">
+                        <label>Horizonte</label>
+                        <select id="customerHorizon">
+                            <option value="short">SHORT (30→7 días)</option>
+                            <option value="medium" selected>MEDIUM (120→7 días)</option>
+                            <option value="long">LONG (240→7 días)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="analyzeCustomer()">🔍 Analizar Cliente</button>
+
+                <div id="customerResult"></div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Matriz Cliente-Producto -->
+        <div id="matrix" class="tab-content">
+            <div class="card">
+                <h2>🔥 Matriz de Afinidad Cliente-Producto</h2>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Top Clientes</label>
+                        <input type="number" id="topCustomers" value="20" min="10" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Top Productos</label>
+                        <input type="number" id="topProducts" value="20" min="10" max="100">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="loadMatrix()">🔍 Cargar Matriz</button>
+
+                <div id="matrixResult"></div>
+            </div>
+        </div>
+
+        <!-- Tab 5: Forecast Agregado -->
+        <div id="forecast" class="tab-content">
+            <div class="card">
+                <h2>🎯 Forecast Agregado</h2>
+                <p style="margin-bottom: 20px;">Predicción combinada de clientes y productos para el período seleccionado</p>
+
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Horizonte Temporal</label>
+                        <select id="forecastHorizon">
+                            <option value="short">SHORT (7 días)</option>
+                            <option value="medium" selected>MEDIUM (7 días)</option>
+                            <option value="long">LONG (7 días)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Días a Predecir</label>
+                        <input type="number" id="forecastDays" value="7" min="1" max="30">
+                    </div>
+                    <div class="form-group">
+                        <label>Probabilidad Mínima</label>
+                        <input type="number" id="minProbability" value="0.5" min="0" max="1" step="0.1">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="generateForecast()">📊 Generar Forecast</button>
+
+                <div id="forecastResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5002/api';
+
+        // ═══════════════════════════════════════════════════════════════════
+        // INICIALIZACIÓN
+        // ═══════════════════════════════════════════════════════════════════
+
+        async function init() {
+            try {
+                const response = await fetch(`${API_URL}/info`);
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    // Actualizar stats
+                    document.getElementById('totalCustomers').textContent =
+                        data.dataset.total_customers.toLocaleString();
+                    document.getElementById('totalProducts').textContent =
+                        data.dataset.total_products.toLocaleString();
+                    document.getElementById('totalTransactions').textContent =
+                        data.dataset.total_transactions.toLocaleString();
+                    document.getElementById('totalModels').textContent =
+                        (data.customer_models.length + data.product_models.total).toLocaleString();
+
+                    // Info de modelos
+                    document.getElementById('customerModelsInfo').textContent =
+                        `${data.customer_models.length} horizontes: ${data.customer_models.join(', ')}`;
+                    document.getElementById('productModelsInfo').textContent =
+                        `${data.product_models.total} productos con modelos LSTM`;
+
+                    // Cargar lista de productos
+                    loadProductsList();
+                }
+            } catch (error) {
+                console.error('Error al cargar info:', error);
+                alert('Error al conectar con el servidor. Asegúrate de que esté corriendo en puerto 5002.');
+            }
+        }
+
+        async function loadProductsList() {
+            try {
+                const response = await fetch(`${API_URL}/products/list`);
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    const select = document.getElementById('productSelect');
+                    select.innerHTML = '<option value="">-- Selecciona un producto --</option>';
+
+                    for (let product of data.products) {
+                        const option = document.createElement('option');
+                        option.value = product.product_code;
+                        option.textContent = `${product.product_code} - ${product.description.substring(0, 50)}`;
+                        select.appendChild(option);
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // TABS
+        // ═══════════════════════════════════════════════════════════════════
+
+        function switchTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar tab seleccionado
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // PREDICCIÓN DE PRODUCTOS
+        // ═══════════════════════════════════════════════════════════════════
+
+        async function predictProduct() {
+            const resultDiv = document.getElementById('productResult');
+            const productCode = document.getElementById('productSelect').value;
+
+            if (!productCode) {
+                alert('Por favor selecciona un producto');
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Prediciendo demanda...</p></div>';
+
+            try {
+                const response = await fetch(`${API_URL}/products/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_code: productCode })
+                });
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    displayProductPrediction(data);
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayProductPrediction(data) {
+            const resultDiv = document.getElementById('productResult');
+
+            let html = '<div style="margin-top: 20px;">';
+
+            // Info del producto
+            html += '<h3 style="color: #667eea; margin-bottom: 15px;">📋 Información del Producto</h3>';
+            html += '<div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">';
+            html += `<p><strong>Código:</strong> ${data.info.product_code}</p>`;
+            html += `<p><strong>Descripción:</strong> ${data.info.description}</p>`;
+            html += `<p><strong>Precio Promedio:</strong> $${data.info.avg_price.toFixed(2)}</p>`;
+            html += `<p><strong>Ventas Totales:</strong> ${data.info.total_sales.toLocaleString()} unidades</p>`;
+            html += `<p><strong>Ingresos Totales:</strong> $${data.info.total_revenue.toLocaleString()}</p>`;
+            html += '</div>';
+
+            // Predicción
+            html += '<h3 style="color: #764ba2; margin-bottom: 15px;">🔮 Predicción LSTM - Próximos 3 Días</h3>';
+            html += '<div class="stats-row">';
+            html += `<div class="stat-box">
+                <div class="label">Día 1</div>
+                <div class="value">${Math.round(data.prediction.day_1)}</div>
+                <div class="label">unidades</div>
+            </div>`;
+            html += `<div class="stat-box">
+                <div class="label">Día 2</div>
+                <div class="value">${Math.round(data.prediction.day_2)}</div>
+                <div class="label">unidades</div>
+            </div>`;
+            html += `<div class="stat-box">
+                <div class="label">Día 3</div>
+                <div class="value">${Math.round(data.prediction.day_3)}</div>
+                <div class="label">unidades</div>
+            </div>`;
+            html += `<div class="stat-box">
+                <div class="label">Total 3 Días</div>
+                <div class="value">${Math.round(data.prediction.total_3_days)}</div>
+                <div class="label">unidades</div>
+            </div>`;
+            html += '</div>';
+
+            // Ingresos estimados
+            const estimated_revenue = data.prediction.total_3_days * data.info.avg_price;
+            html += `<div style="margin-top: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">`;
+            html += `<h3 style="margin-bottom: 10px;">💰 Ingresos Estimados (3 días)</h3>`;
+            html += `<div style="font-size: 2.5em; font-weight: bold;">$${estimated_revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>`;
+            html += '</div>';
+
+            html += '</div>';
+            resultDiv.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // MATRIZ CLIENTE-PRODUCTO
+        // ═══════════════════════════════════════════════════════════════════
+
+        async function loadMatrix() {
+            const resultDiv = document.getElementById('matrixResult');
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Cargando matriz...</p></div>';
+
+            const topCustomers = document.getElementById('topCustomers').value;
+            const topProducts = document.getElementById('topProducts').value;
+
+            try {
+                const response = await fetch(
+                    `${API_URL}/customer-product-matrix?top_customers=${topCustomers}&top_products=${topProducts}`
+                );
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    displayMatrix(data);
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayMatrix(data) {
+            const resultDiv = document.getElementById('matrixResult');
+
+            let html = '<div class="heatmap-container">';
+            html += '<p style="margin: 20px 0;">Intensidad de color = Frecuencia de compra × Valor promedio</p>';
+
+            // Calcular valores para normalizar colores
+            let maxValue = 0;
+            for (let customer of data.customers) {
+                const customerData = data.matrix[customer] || {};
+                for (let product of data.products) {
+                    if (customerData[product]) {
+                        const value = customerData[product].frequency * customerData[product].avg_value;
+                        maxValue = Math.max(maxValue, value);
+                    }
+                }
+            }
+
+            // Crear tabla de resumen
+            html += '<table class="data-table"><thead><tr>';
+            html += '<th>Cliente</th><th>Productos Comprados</th><th>Gasto Total</th><th>Frecuencia Promedio</th>';
+            html += '</tr></thead><tbody>';
+
+            for (let customer of data.customers.slice(0, 10)) {
+                const customerData = data.matrix[customer] || {};
+                const products = Object.keys(customerData);
+                const totalValue = products.reduce((sum, p) => sum + customerData[p].total_value, 0);
+                const avgFreq = products.length > 0
+                    ? products.reduce((sum, p) => sum + customerData[p].frequency, 0) / products.length
+                    : 0;
+
+                html += `<tr>
+                    <td><strong>${customer}</strong></td>
+                    <td>${products.length}</td>
+                    <td>$${totalValue.toFixed(2)}</td>
+                    <td>${avgFreq.toFixed(1)}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table></div>';
+            resultDiv.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // FORECAST AGREGADO
+        // ═══════════════════════════════════════════════════════════════════
+
+        async function generateForecast() {
+            const resultDiv = document.getElementById('forecastResult');
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generando forecast...</p></div>';
+
+            const payload = {
+                horizon: document.getElementById('forecastHorizon').value,
+                forecast_days: parseInt(document.getElementById('forecastDays').value),
+                min_purchase_probability: parseFloat(document.getElementById('minProbability').value)
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/aggregate-forecast`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    displayForecast(data);
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayForecast(data) {
+            const resultDiv = document.getElementById('forecastResult');
+
+            let html = '<div style="margin-top: 20px;">';
+
+            // Resumen
+            html += '<div class="stats-row">';
+            html += `<div class="stat-box">
+                <div class="label">Clientes Esperados</div>
+                <div class="value">${data.summary.total_expected_customers}</div>
+            </div>`;
+            html += `<div class="stat-box">
+                <div class="label">Tasa de Actividad</div>
+                <div class="value">${data.summary.active_customers_rate}%</div>
+            </div>`;
+            html += `<div class="stat-box">
+                <div class="label">Ingresos Esperados</div>
+                <div class="value">$${data.summary.total_expected_revenue.toLocaleString()}</div>
+            </div>`;
+            html += '</div>';
+
+            // Tabla de productos
+            html += '<table class="data-table" style="margin-top: 20px;"><thead><tr>';
+            html += '<th>Producto</th><th>Clientes Esperados</th><th>Unidades Esperadas</th>';
+            html += '</tr></thead><tbody>';
+
+            for (let product of data.product_forecast.slice(0, 20)) {
+                html += `<tr>
+                    <td><strong>${product.product_code}</strong></td>
+                    <td>${product.expected_customers}</td>
+                    <td>${product.expected_units}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table></div>';
+            resultDiv.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ANÁLISIS DE CLIENTE
+        // ═══════════════════════════════════════════════════════════════════
+
+        async function analyzeCustomer() {
+            const resultDiv = document.getElementById('customerResult');
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analizando cliente...</p></div>';
+
+            const payload = {
+                customer_id: parseInt(document.getElementById('customerId').value),
+                horizon: document.getElementById('customerHorizon').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/predict-customer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    displayCustomerAnalysis(data);
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function displayCustomerAnalysis(data) {
+            const resultDiv = document.getElementById('customerResult');
+
+            let html = '<div style="margin-top: 20px;">';
+
+            // Predicción
+            html += '<div class="stats-row">';
+            html += `<div class="stat-box">
+                <div class="label">Probabilidad de Compra</div>
+                <div class="value">${(data.prediction.purchase_probability * 100).toFixed(1)}%</div>
+            </div>`;
+            html += `<div class="stat-box">
+                <div class="label">Días hasta Compra</div>
+                <div class="value">${data.prediction.days_until_purchase}</div>
+            </div>`;
+            html += `<div class="stat-box">
+                <div class="label">Valor Esperado</div>
+                <div class="value">$${data.prediction.expected_value.toFixed(2)}</div>
+            </div>`;
+            html += '</div>';
+
+            // Top productos
+            html += '<h3 style="margin-top: 30px; color: #667eea;">🛒 Productos con Mayor Afinidad</h3>';
+            html += '<table class="data-table"><thead><tr>';
+            html += '<th>Producto</th><th>Frecuencia</th><th>Valor Promedio</th><th>Última Compra (días)</th>';
+            html += '</tr></thead><tbody>';
+
+            for (let product of data.top_products) {
+                html += `<tr>
+                    <td><strong>${product.product_code}</strong></td>
+                    <td>${product.frequency}</td>
+                    <td>$${product.avg_value}</td>
+                    <td>${product.last_purchase_days}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table></div>';
+            resultDiv.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // EJECUTAR AL CARGAR
+        // ═══════════════════════════════════════════════════════════════════
+
+        window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "horizon": "medium",
+  "total_loss": 152134.015625,
+  "purchase_prob_loss": 0.35625678300857544,
+  "days_loss": 2.6146271228790283,
+  "value_loss": 304221.0625,
+  "purchase_prob_accuracy": 87.5926673412323,
+  "purchase_prob_auc": 0.6599520444869995,
+  "days_mae": 5.0,
+  "value_mae": 123.71676232704094,
+  "train_samples": 664216,
+  "val_samples": 166055,
+  "epochs_trained": 30,
+  "purchase_prob_accuracy_raw": 0.875926673412323,
+  "keras_scale_detected": "0-1",
+  "_correction_note": "Accuracy/AUC corregidos del training history. Days/Value MAE son estimados.",
+  "days_mae_original": 5.0
+}

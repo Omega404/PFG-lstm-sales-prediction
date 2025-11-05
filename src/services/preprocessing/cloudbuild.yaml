@@ -1,0 +1,63 @@
+# ============================================================================
+# CLOUD BUILD CONFIGURATION
+# ============================================================================
+# Archivo de configuración para Google Cloud Build
+# Permite builds más rápidos y optimizados
+
+steps:
+  # Step 1: Build de imagen Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/lstm-prediction-service:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/lstm-prediction-service:latest'
+      - '-f'
+      - 'src/services/preprocessing/Dockerfile'
+      - '.'
+    timeout: 1200s
+
+  # Step 2: Push de imagen a Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/lstm-prediction-service:$SHORT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/lstm-prediction-service:latest'
+
+  # Step 3: Deploy a Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'lstm-prediction-service'
+      - '--image=gcr.io/$PROJECT_ID/lstm-prediction-service:$SHORT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--timeout=300s'
+      - '--max-instances=10'
+      - '--min-instances=0'
+      - '--allow-unauthenticated'
+      - '--port=8080'
+      - '--set-env-vars=ENVIRONMENT=production,TF_CPP_MIN_LOG_LEVEL=2'
+
+# Imágenes a subir
+images:
+  - 'gcr.io/$PROJECT_ID/lstm-prediction-service:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/lstm-prediction-service:latest'
+
+# Opciones de build
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: 100
+  logging: CLOUD_LOGGING_ONLY
+
+# Timeout total
+timeout: 1800s

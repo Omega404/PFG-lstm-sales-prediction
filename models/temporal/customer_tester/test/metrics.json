@@ -1,0 +1,17 @@
+{
+  "horizon": "test",
+  "total_loss": 117000.671875,
+  "purchase_prob_loss": 0.35254329442977905,
+  "days_loss": 2.637259006500244,
+  "value_loss": 233936.75,
+  "purchase_prob_accuracy": 51.71595811843872,
+  "purchase_prob_accuracy_raw": 0.5171595811843872,
+  "keras_scale_detected": "0-1",
+  "purchase_prob_auc": 0.8785725235939026,
+  "days_mae": 0.5171595822014768,
+  "value_mae": 119.99742327451433,
+  "train_samples": 418190,
+  "val_samples": 104548,
+  "epochs_trained": 3,
+  "training_time_seconds": 99.877924
+}

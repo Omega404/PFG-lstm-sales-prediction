@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Predicción de Ventas - LSTM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #868686 0%, #5a5a5a 100%);
+            margin-top: 10px;
+        }
+
+        .result-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .prediction-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .prediction-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .prediction-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item label {
+            color: #666;
+            font-size: 0.9em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .info-item value {
+            color: #333;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success-message {
+            background: #00C851;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .products-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .product-item {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .product-item:hover {
+            background: #e9ecef;
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .product-code {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .product-desc {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .horizon-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Sistema de Predicción de Ventas LSTM</h1>
+            <p>Predicción de demanda basada en Deep Learning</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Panel izquierdo: Formulario -->
+            <div class="card">
+                <h2>🔍 Consultar Predicción</h2>
+
+                <div class="form-group">
+                    <label for="productCode">Código de Producto</label>
+                    <input
+                        type="text"
+                        id="productCode"
+                        placeholder="Ej: 20723, 22112, 85123A"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="horizon">Horizonte Temporal</label>
+                    <select id="horizon">
+                        <option value="short">Corto Plazo (2 semanas)</option>
+                        <option value="medium">Medio Plazo (1 mes)</option>
+                        <option value="long">Largo Plazo (2 meses)</option>
+                    </select>
+                </div>
+
+                <div class="horizon-info" id="horizonInfo">
+                    <strong>Corto Plazo:</strong> Predicción para las próximas 2 semanas basada en los últimos 28 días.
+                </div>
+
+                <button class="btn" onclick="predict()">
+                    🚀 Predecir Ventas
+                </button>
+
+                <button class="btn btn-secondary" onclick="loadProducts()">
+                    📋 Ver Productos Disponibles
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px; color: #666;">Cargando...</p>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+            </div>
+
+            <!-- Panel derecho: Resultados -->
+            <div class="card">
+                <h2>📈 Resultados de Predicción</h2>
+
+                <div id="resultSection" class="result-section">
+                    <div class="prediction-box">
+                        <div class="prediction-label">Predicción de Ventas</div>
+                        <div class="prediction-value" id="predictionValue">0</div>
+                        <div class="prediction-label">unidades estimadas</div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Producto</label>
+                            <value id="productInfo">-</value>
+                        </div>
+                        <div class="info-item">
+                            <label>Horizonte</label>
+                            <value id="horizonDisplay">-</value>
+                        </div>
+                        <div class="info-item">
+                            <label>Promedio 30 días</label>
+                            <value id="avgDaily">-</value>
+                        </div>
+                        <div class="info-item">
+                            <label>Máximo 30 días</label>
+                            <value id="maxDaily">-</value>
+                        </div>
+                        <div class="info-item">
+                            <label>Total Histórico</label>
+                            <value id="totalSales">-</value>
+                        </div>
+                        <div class="info-item">
+                            <label>Precio Promedio</label>
+                            <value id="avgPrice">-</value>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="historyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Lista de productos -->
+                <div id="productsSection" style="display: none;">
+                    <p style="color: #666; margin-bottom: 10px;">
+                        <strong id="productsCount">0</strong> productos con modelos entrenados
+                    </p>
+                    <div class="products-list" id="productsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let currentChart = null;
+
+        // Actualizar info del horizonte
+        document.getElementById('horizon').addEventListener('change', function() {
+            const info = {
+                'short': '<strong>Corto Plazo:</strong> Predicción para las próximas 2 semanas basada en los últimos 28 días.',
+                'medium': '<strong>Medio Plazo:</strong> Predicción para el próximo mes basada en los últimos 3 meses.',
+                'long': '<strong>Largo Plazo:</strong> Predicción para los próximos 2 meses basada en los últimos 6 meses.'
+            };
+            document.getElementById('horizonInfo').innerHTML = info[this.value];
+        });
+
+        // Función principal de predicción
+        async function predict() {
+            const productCode = document.getElementById('productCode').value.trim();
+            const horizon = document.getElementById('horizon').value;
+
+            if (!productCode) {
+                showError('Por favor ingresa un código de producto');
+                return;
+            }
+
+            showLoading(true);
+            hideError();
+            hideSuccess();
+
+            try {
+                const response = await fetch(`${API_URL}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_code: productCode,
+                        horizon: horizon
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                    showSuccess('Predicción realizada correctamente');
+                } else {
+                    showError(data.error || 'Error al realizar la predicción');
+                }
+            } catch (error) {
+                showError('Error de conexión: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Mostrar resultados
+        function displayResults(data) {
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('productsSection').style.display = 'none';
+
+            // Predicción principal
+            const predValue = Math.max(0, Math.round(data.prediction.value));
+            document.getElementById('predictionValue').textContent = predValue;
+
+            // Info del producto
+            const horizonNames = {
+                'short': 'Corto Plazo (2 sem)',
+                'medium': 'Medio Plazo (1 mes)',
+                'long': 'Largo Plazo (2 meses)'
+            };
+
+            document.getElementById('productInfo').textContent = data.product_code;
+            document.getElementById('horizonDisplay').textContent = horizonNames[data.horizon];
+            document.getElementById('avgDaily').textContent = data.historical.avg_daily.toFixed(1) + ' u/día';
+            document.getElementById('maxDaily').textContent = data.historical.max_daily.toFixed(0) + ' u/día';
+
+            if (data.product_info) {
+                document.getElementById('totalSales').textContent =
+                    data.product_info.TotalSales?.toLocaleString() || '-';
+                document.getElementById('avgPrice').textContent =
+                    '$' + (data.product_info.AvgPrice?.toFixed(2) || '0');
+            }
+
+            // Gráfico de historial
+            drawHistoryChart(data.historical.last_30_days, predValue);
+        }
+
+        // Dibujar gráfico
+        function drawHistoryChart(historical, prediction) {
+            const ctx = document.getElementById('historyChart').getContext('2d');
+
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            const labels = historical.map((_, i) => `Día ${i + 1}`);
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ventas Históricas (30 días)',
+                        data: historical,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Historial de Ventas (Últimos 30 días)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cargar lista de productos
+        async function loadProducts() {
+            showLoading(true);
+            hideError();
+
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayProducts(data.products, data.count);
+                    document.getElementById('resultSection').style.display = 'none';
+                    document.getElementById('productsSection').style.display = 'block';
+                } else {
+                    showError(data.error || 'Error al cargar productos');
+                }
+            } catch (error) {
+                showError('Error de conexión: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Mostrar lista de productos
+        function displayProducts(products, count) {
+            document.getElementById('productsCount').textContent = count;
+            const listEl = document.getElementById('productsList');
+            listEl.innerHTML = '';
+
+            products.forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                item.onclick = () => {
+                    document.getElementById('productCode').value = product.ProductCode;
+                    document.getElementById('productsSection').style.display = 'none';
+                };
+
+                item.innerHTML = `
+                    <div class="product-code">${product.ProductCode}</div>
+                    <div class="product-desc">${product.Description || 'Sin descripción'}</div>
+                `;
+
+                listEl.appendChild(item);
+            });
+        }
+
+        // Funciones auxiliares
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+
+        function hideSuccess() {
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Enter para buscar
+        document.getElementById('productCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                predict();
+            }
+        });
+
+        // Mensaje inicial
+        console.log('Sistema de Predicción de Ventas LSTM cargado correctamente');
+    </script>
+</body>
+</html>

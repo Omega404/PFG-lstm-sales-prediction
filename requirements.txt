@@ -1,9 +1,19 @@
-fastapi
-uvicorn[standard]
-pandas
-openpyxl
-numpy
-gunicorn
-tensorflow
-scikit-learn
-matplotlib
+# Framework web
+flask==3.0.0
+werkzeug==3.0.1
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.2
+openpyxl==3.1.2
+
+# Machine Learning
+tensorflow==2.20.0
+scikit-learn==1.3.2
+
+# Utilidades
+python-dateutil==2.8.2
+joblib==1.3.2
+
+# Produccion
+gunicorn==21.2.0

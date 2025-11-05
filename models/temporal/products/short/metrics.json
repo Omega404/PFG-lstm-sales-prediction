@@ -1,0 +1,12 @@
+{
+  "horizon": "short",
+  "window_days": 30,
+  "forecast_days": 7,
+  "mae": 20.011831357499283,
+  "rmse": 46.06142711166932,
+  "train_samples": 52288,
+  "val_samples": 13072,
+  "epochs_trained": 20,
+  "final_train_loss": 0.0007605624268762767,
+  "final_val_loss": 0.0006415536627173424
+}

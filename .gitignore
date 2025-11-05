@@ -1,55 +1,190 @@
-# Entornos virtuales
-.venv/
-venv/
-env/
-
-# Archivos de Python
+# ============================================================================
+# Python
+# ============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.egg
+*.egg-info/
+dist/
+build/
+.Python
 
-# Modelos entrenados (muy pesados)
-models/*.h5
-models/*.keras
-models/*.pkl
+# ============================================================================
+# Entornos Virtuales
+# ============================================================================
+.venv/
+venv/
+env/
+ENV/
+.virtualenv/
 
-# Datos grandes
-./data
-data/*.xlsx
-data/*.csv
-*.xlsx
-*.csv
-
-
-# Gráficas generadas
-plots/*.png
-plots/*.jpg
-results/plots/*.png
-results/plots/*.jpg
-results/reports/*.pdf
-results/reports/*.docx
-results/reports/*.xlsx
-results/reports/*.csv
-results/reports/*.json
-results/reports/temporal/*.json
-
-# IDE
+# ============================================================================
+# IDEs y Editores
+# ============================================================================
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.project
+.pydevproject
+.settings/
 
-# Sistema operativo
+# ============================================================================
+# Sistema Operativo
+# ============================================================================
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Logs
+# ============================================================================
+# Modelos Entrenados (PESADOS - No subir a Git)
+# ============================================================================
+models/**/*.h5
+models/**/*.keras
+models/**/*.pkl
+models/**/*.hdf5
+models/trained/*.h5
+models/trained/*.keras
+models/temporal/**/*.h5
+models/temporal/**/*.keras
+models/temporal/**/*.pkl
+models/colab/
+mlruns/
+
+# Mantener solo la estructura de carpetas
+!models/.gitkeep
+!models/trained/.gitkeep
+!models/temporal/.gitkeep
+
+# ============================================================================
+# Datos (PESADOS - No subir a Git)
+# ============================================================================
+data/*.xlsx
+data/*.csv
+data/raw/*.xlsx
+data/raw/*.csv
+data/processed/*.xlsx
+data/processed/*.csv
+*.xlsx
+*.csv
+
+# Mantener estructura
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# ============================================================================
+# Outputs y Resultados
+# ============================================================================
+output/
+results/
+reports/
+plots/
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.docx
+
+# Mantener estructura
+!output/.gitkeep
+!results/.gitkeep
+
+# ============================================================================
+# Logs y Temporales
+# ============================================================================
 *.log
+*.tmp
+*.temp
+nul
+*.swp
+logs/
+mlruns/
 
-#notas
-/data/notes/*.txt
-/notes/*.txt
-/notes/*.md
-notes/notes/claude.txt 
-notes/claude.txt 
+# ============================================================================
+# Notebooks Auxiliares y Temporales
+# ============================================================================
+notebooks/**/*_test.ipynb
+notebooks/**/*_debug.ipynb
+notebooks/**/*_temp.ipynb
+.ipynb_checkpoints/
+
+# ============================================================================
+# Configuraciones Locales y Secretos
+# ============================================================================
+.env
+.env.local
+*.key
+*.pem
+config/local.py
+credentials.json
+service-account*.json
+
+# ============================================================================
+# Cloud y Deployment
+# ============================================================================
+.gcloudignore
+.dockerignore
+
+# ============================================================================
+# Training y Scripts Locales
+# ============================================================================
+scripts/**/*.bat
+training/
+kaggle/
+
+# ============================================================================
+# Documentación Auxiliar (Mantener solo lo esencial)
+# ============================================================================
+docs/KAGGLE*.md
+docs/MLFLOW*.md
+docs/HISTORIAL*.md
+docs/VERTEX*.md
+docs/CLOUD*.md
+docs/POST_TRAINING*.md
+docs/INSTRUCCIONES*.md
+
+# ============================================================================
+# Notas y Archivos Personales
+# ============================================================================
+notes/
+*.txt
+TODO.md
+NOTES.md
+
+# ============================================================================
+# Apps Auxiliares (No parte del sistema principal)
+# ============================================================================
+app_prediccion.py
+app_prediccion_simple.py
+app_prediccion_lstm.py
+app_analisis_integrado.py
+
+# ============================================================================
+# Claude AI
+# ============================================================================
+.claude/
+
+# ============================================================================
+# IMPORTANTE: Archivos que SÍ se deben subir
+# ============================================================================
+# Core del sistema
+!src/
+!templates/
+!app_cross_analysis_web.py
+!requirements.txt
+!README.md
+!Dockerfile
+
+# Documentación esencial
+!docs/README_WEB_SYSTEM.md
+!docs/RESUMEN_CAPACIDADES_MODELOS.md
+!docs/CONFIGURACIONES_MODELOS.md
+!docs/ANALISIS_COMPARATIVO.md
+
+# Scripts de análisis principales
+!scripts/analysis/analisis_realista_modelos.py
+!scripts/analysis/analyze_results.py
