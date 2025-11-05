@@ -11,10 +11,62 @@ import json
 import os
 from datetime import datetime, timedelta
 import sys
+import urllib.request
 
 # Fix encoding para Windows
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
+
+# ===========================================================================
+# DESCARGA DE MODELOS DESDE CLOUD STORAGE
+# ===========================================================================
+
+def download_from_cloud_storage():
+    """Descargar modelos y datos desde Google Cloud Storage"""
+    print("\n" + "=" * 80)
+    print("DESCARGANDO MODELOS Y DATOS DESDE CLOUD STORAGE")
+    print("=" * 80)
+
+    bucket_url = 'https://storage.googleapis.com/lstm-models-pfg'
+
+    files_to_download = [
+        # Customer V3 models
+        ('customer_v3/medium/model_best.keras', 'models/temporal/customer_v3/medium/model_best.keras'),
+        ('customer_v3/medium/scaler_X.pkl', 'models/temporal/customer_v3/medium/scaler_X.pkl'),
+        ('customer_v3/medium/scaler_y_days.pkl', 'models/temporal/customer_v3/medium/scaler_y_days.pkl'),
+        ('customer_v3/medium/scaler_y_value.pkl', 'models/temporal/customer_v3/medium/scaler_y_value.pkl'),
+        ('customer_v3/medium/metrics.json', 'models/temporal/customer_v3/medium/metrics.json'),
+        # Product models
+        ('products/short/model_best.keras', 'models/temporal/products_50epochs/short/model_best.keras'),
+        ('products/short/scaler_X.pkl', 'models/temporal/products_50epochs/short/scaler_X.pkl'),
+        ('products/short/scaler_y.pkl', 'models/temporal/products_50epochs/short/scaler_y.pkl'),
+        ('products/short/metrics.json', 'models/temporal/products_50epochs/short/metrics.json'),
+        # Data
+        ('data/online_retail_2.xlsx', 'data/processed/online_retail_2.xlsx'),
+    ]
+
+    for cloud_path, local_path in files_to_download:
+        if os.path.exists(local_path):
+            print(f"✓ {local_path} ya existe (skip)")
+            continue
+
+        url = f'{bucket_url}/{cloud_path}'
+        print(f"⬇ Descargando {cloud_path}...")
+
+        try:
+            os.makedirs(os.path.dirname(local_path), exist_ok=True)
+            urllib.request.urlretrieve(url, local_path)
+            file_size = os.path.getsize(local_path) / (1024 * 1024)  # MB
+            print(f"  ✓ Descargado ({file_size:.1f} MB)")
+        except Exception as e:
+            print(f"  ✗ ERROR: {e}")
+            raise
+
+    print("\n✓ TODOS LOS ARCHIVOS DESCARGADOS")
+    print("=" * 80 + "\n")
+
+# Descargar modelos al inicio (solo una vez)
+download_from_cloud_storage()
 
 # Importar el analizador cruzado
 sys.path.append('src/analysis')
@@ -526,4 +578,6 @@ if __name__ == '__main__':
     print("     GET  /api/export/<format>")
     print("\nPresiona Ctrl+C para detener el servidor\n")
 
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    # Puerto configurable para Cloud Run (usa PORT env var, default 5001)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(debug=False, host='0.0.0.0', port=port)

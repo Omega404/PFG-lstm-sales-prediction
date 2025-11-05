@@ -1,5 +1,5 @@
 # ============================================================================
-# DOCKERFILE PARA GOOGLE CLOUD RUN - LSTM PREDICTION SERVICE
+# DOCKERFILE PARA GOOGLE CLOUD RUN - LSTM CROSS ANALYSIS WEB SERVICE
 # ============================================================================
 
 FROM python:3.11-slim
@@ -25,17 +25,16 @@ COPY requirements.txt .
 # Instalar dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar aplicacion
-COPY app_prediccion_lstm.py .
-COPY prediccion_lstm.html .
+# Copiar código fuente
+COPY app_cross_analysis_web.py .
+COPY src/ ./src/
+COPY templates/ ./templates/
 
 # Crear directorios necesarios
-RUN mkdir -p data/processed models/trained
+RUN mkdir -p data/processed models/temporal/customer_v3/medium models/temporal/products_50epochs/short
 
-# Copiar datos y modelos explícitamente
-COPY data/processed/product_demand.xlsx ./data/processed/product_demand.xlsx
-COPY models/trained/*.h5 ./models/trained/
-COPY models/trained/*.pkl ./models/trained/
+# NOTA: Los modelos y datos deben descargarse al inicio o montarse desde Cloud Storage
+# No se incluyen en la imagen por su tamaño (excluidos en .gitignore)
 
 # Crear usuario no-root
 RUN useradd -m -u 1000 appuser && \
@@ -45,5 +44,5 @@ USER appuser
 
 EXPOSE 8080
 
-# Comando de inicio
-CMD exec python app_prediccion_lstm.py
+# Comando de inicio - Cloud Run usa PORT=8080
+CMD exec python app_cross_analysis_web.py
